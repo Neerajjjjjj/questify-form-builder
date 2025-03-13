@@ -1,60 +1,74 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import PageTransition from '@/components/ui-custom/PageTransition';
 import FormCard from '@/components/ui-custom/FormCard';
 import NewFormButton from '@/components/ui-custom/NewFormButton';
 import { useForm } from '@/context/FormContext';
-import { formatDistanceToNow } from 'date-fns';
-import { motion } from 'framer-motion';
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const { state } = useForm();
+  const [search, setSearch] = useState('');
   
-  // Format the last edited time
-  const formatLastEdited = (dateString: string) => {
-    try {
-      return formatDistanceToNow(new Date(dateString), { addSuffix: true });
-    } catch (error) {
-      return 'recently';
-    }
-  };
-
+  // Filter forms based on search term
+  const filteredForms = state.forms.filter(form => 
+    form.title.toLowerCase().includes(search.toLowerCase())
+  );
+  
   return (
-    <PageTransition className="min-h-screen bg-form-light-gray">
-      <header className="bg-white border-b border-form-card-border">
-        <div className="max-w-screen-xl mx-auto px-4 py-4 flex items-center justify-between">
-          <h1 className="text-2xl font-medium">Form Builder</h1>
-        </div>
-      </header>
-      
-      <main className="max-w-screen-xl mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h2 className="text-lg font-medium mb-1">Recent forms</h2>
-          <p className="text-form-dark-gray">Create or edit your forms</p>
-        </div>
+    <PageTransition>
+      <div className="max-w-screen-xl mx-auto p-4 md:p-8">
+        <header className="mb-8">
+          <h1 className="text-2xl md:text-3xl font-bold mb-2 text-form-dark-gray">My Forms</h1>
+          <div className="flex flex-col md:flex-row justify-between gap-4">
+            <p className="text-form-gray">Create, manage, and analyze your forms</p>
+            
+            <input
+              type="text"
+              placeholder="Search forms..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="max-w-md px-4 py-2 border border-form-card-border rounded-lg focus:outline-none focus:ring-2 focus:ring-form-accent-blue"
+            />
+          </div>
+        </header>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          <NewFormButton />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* New form button */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+          >
+            <NewFormButton />
+          </motion.div>
           
-          {state.forms.map((form, index) => (
+          {/* Existing forms */}
+          {filteredForms.map((form, index) => (
             <motion.div
               key={form.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05 }}
+              transition={{ delay: 0.1 + (index + 1) * 0.05 }}
             >
               <FormCard
-                id={form.id}
-                title={form.title}
-                lastEdited={formatLastEdited(form.updatedAt)}
-                responseCount={form.responseCount}
+                form={form}
+                onEdit={() => navigate(`/builder/${form.id}`)}
+                onResponses={() => navigate(`/responses/${form.id}`)}
+                onPreview={() => navigate(`/preview/${form.id}`)}
               />
             </motion.div>
           ))}
+          
+          {/* Show message when no forms match search */}
+          {filteredForms.length === 0 && search && (
+            <div className="col-span-full text-center p-6">
+              <p className="text-form-dark-gray">No forms found matching "{search}"</p>
+            </div>
+          )}
         </div>
-      </main>
+      </div>
     </PageTransition>
   );
 };

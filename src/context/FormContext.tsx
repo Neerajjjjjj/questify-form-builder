@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useReducer, ReactNode, useEffect } from 'react';
 
 // Types for our form data
@@ -328,7 +329,7 @@ export const FormProvider: React.FC<FormProviderProps> = ({ children }) => {
   }, [state.forms, state.responses]);
   
   // Helper functions
-  const createForm = (title: string, description: string) => {
+  const createForm = (title: string, description: string): Form => {
     const newForm: Form = {
       id: `form-${Date.now()}`,
       title,

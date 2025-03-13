@@ -10,6 +10,7 @@ import {
 } from './QuestionTypes';
 import { useForm, Question } from '@/context/FormContext';
 import { Eye, ArrowLeft, Settings, Palette } from 'lucide-react';
+import { toast } from 'sonner';
 
 const FormBuilder: React.FC = () => {
   const { formId } = useParams<{ formId: string }>();
@@ -30,10 +31,19 @@ const FormBuilder: React.FC = () => {
   // Initialize or load the form
   useEffect(() => {
     if (formId === 'new') {
-      const newForm = createForm('Untitled Form', '');
-      // Check if form was created successfully
-      if (newForm) {
-        navigate(`/builder/${newForm.id}`, { replace: true });
+      try {
+        const newForm = createForm('Untitled Form', '');
+        console.log("Created new form:", newForm);
+        // Navigate to the new form's edit page
+        if (newForm && newForm.id) {
+          navigate(`/builder/${newForm.id}`, { replace: true });
+        } else {
+          console.error("Failed to create new form, newForm:", newForm);
+          toast.error("Failed to create new form");
+        }
+      } catch (error) {
+        console.error("Error creating new form:", error);
+        toast.error("Error creating new form");
       }
     } else if (formId) {
       const existingForm = getForm(formId);
@@ -48,6 +58,8 @@ const FormBuilder: React.FC = () => {
         }
       } else {
         // Form not found, redirect to dashboard
+        console.error("Form not found:", formId);
+        toast.error("Form not found");
         navigate('/');
       }
     }

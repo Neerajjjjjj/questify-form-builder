@@ -1,14 +1,9 @@
 
 import React from 'react';
 import FormResponses from '@/components/ui-custom/FormResponses';
-import { FormProvider } from '@/context/FormContext';
 
 const Responses: React.FC = () => {
-  return (
-    <FormProvider>
-      <FormResponses />
-    </FormProvider>
-  );
+  return <FormResponses />;
 };
 
 export default Responses;
