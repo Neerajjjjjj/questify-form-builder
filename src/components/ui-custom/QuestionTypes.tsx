@@ -9,7 +9,8 @@ import {
   Type,
   List,
   CheckSquare,
-  ChevronDown
+  ChevronDown,
+  Plus
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';

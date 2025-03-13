@@ -5,7 +5,9 @@ import { FormProvider } from '@/context/FormContext';
 
 const Builder: React.FC = () => {
   return (
-    <FormBuilder />
+    <FormProvider>
+      <FormBuilder />
+    </FormProvider>
   );
 };
 

@@ -1,9 +1,9 @@
 
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { motion } from 'framer-motion';
+import { motion, HTMLMotionProps } from 'framer-motion';
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface ButtonProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, keyof HTMLMotionProps<"button">> {
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'link' | 'danger';
   size?: 'sm' | 'md' | 'lg' | 'icon';
   isLoading?: boolean;
@@ -40,9 +40,9 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       icon: 'p-2 aspect-square',
     };
     
+    // Create button component without motion for type compatibility
     return (
-      <motion.button
-        whileTap={{ scale: 0.97 }}
+      <button
         ref={ref}
         className={cn(
           'font-medium rounded-md inline-flex items-center justify-center transition-all duration-200 disabled:opacity-50 disabled:pointer-events-none',
@@ -63,7 +63,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {!isLoading && leftIcon && <span className="mr-2">{leftIcon}</span>}
         {children}
         {!isLoading && rightIcon && <span className="ml-2">{rightIcon}</span>}
-      </motion.button>
+      </button>
     );
   }
 );

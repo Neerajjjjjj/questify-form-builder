@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -31,7 +30,9 @@ const FormBuilder: React.FC = () => {
   useEffect(() => {
     if (formId === 'new') {
       const newForm = createForm('Untitled Form', '');
-      navigate(`/builder/${newForm.id}`, { replace: true });
+      if (newForm && newForm.id) {
+        navigate(`/builder/${newForm.id}`, { replace: true });
+      }
     } else if (formId) {
       const existingForm = getForm(formId);
       if (existingForm) {
