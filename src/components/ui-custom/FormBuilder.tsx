@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -30,7 +31,8 @@ const FormBuilder: React.FC = () => {
   useEffect(() => {
     if (formId === 'new') {
       const newForm = createForm('Untitled Form', '');
-      if (newForm && newForm.id) {
+      // Check if form was created successfully
+      if (newForm) {
         navigate(`/builder/${newForm.id}`, { replace: true });
       }
     } else if (formId) {
@@ -92,7 +94,7 @@ const FormBuilder: React.FC = () => {
           <div className="flex items-center gap-4">
             <Button 
               variant="ghost" 
-              size="icon" 
+              size="icon"
               onClick={() => navigate('/')}
               leftIcon={<ArrowLeft size={18} />}
             />

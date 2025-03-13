@@ -1,9 +1,8 @@
 
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { motion, HTMLMotionProps } from 'framer-motion';
 
-interface ButtonProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, keyof HTMLMotionProps<"button">> {
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'link' | 'danger';
   size?: 'sm' | 'md' | 'lg' | 'icon';
   isLoading?: boolean;
@@ -40,7 +39,6 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       icon: 'p-2 aspect-square',
     };
     
-    // Create button component without motion for type compatibility
     return (
       <button
         ref={ref}

@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useReducer, ReactNode, useEffect } from 'react';
 
 // Types for our form data
@@ -271,7 +270,7 @@ const formReducer = (state: FormState, action: FormAction): FormState => {
 interface FormContextType {
   state: FormState;
   dispatch: React.Dispatch<FormAction>;
-  createForm: (title: string, description: string) => void;
+  createForm: (title: string, description: string) => Form;
   updateForm: (form: Partial<Form>) => void;
   deleteForm: (formId: string) => void;
   getForm: (formId: string) => Form | undefined;
