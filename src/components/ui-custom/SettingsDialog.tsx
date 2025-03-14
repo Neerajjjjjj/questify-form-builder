@@ -2,7 +2,7 @@
 import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Settings, Paintbrush, Globe, Bell } from 'lucide-react';
+import { Settings, Paintbrush, Globe, Bell, Check } from 'lucide-react';
 import { useTheme } from '@/context/ThemeContext';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
