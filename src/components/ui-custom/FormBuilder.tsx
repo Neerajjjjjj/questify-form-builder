@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import PageTransition from './PageTransition';
-import Button from './Button';
+import { Button } from '@/components/ui/button';
 import { 
   QuestionCard, 
   AddQuestionButton 
@@ -11,6 +11,8 @@ import {
 import { useForm, Question } from '@/context/FormContext';
 import { Eye, ArrowLeft, Settings, Palette } from 'lucide-react';
 import { toast } from 'sonner';
+import ThemeSelector from './ThemeSelector';
+import SettingsDialog from './SettingsDialog';
 
 const FormBuilder: React.FC = () => {
   const { formId } = useParams<{ formId: string }>();
@@ -27,6 +29,8 @@ const FormBuilder: React.FC = () => {
   const [formTitle, setFormTitle] = useState('Untitled Form');
   const [formDescription, setFormDescription] = useState('');
   const [selectedQuestionId, setSelectedQuestionId] = useState<string | null>(null);
+  const [themeDialogOpen, setThemeDialogOpen] = useState(false);
+  const [settingsDialogOpen, setSettingsDialogOpen] = useState(false);
   
   // Initialize or load the form
   useEffect(() => {
@@ -108,8 +112,9 @@ const FormBuilder: React.FC = () => {
               variant="ghost" 
               size="icon"
               onClick={() => navigate('/')}
-              leftIcon={<ArrowLeft size={18} />}
-            />
+            >
+              <ArrowLeft size={18} />
+            </Button>
             
             <div className="flex flex-col">
               <input
@@ -126,18 +131,22 @@ const FormBuilder: React.FC = () => {
             <Button 
               variant="ghost" 
               size="icon"
-              leftIcon={<Palette size={18} />}
-            />
+              onClick={() => setThemeDialogOpen(true)}
+            >
+              <Palette size={18} />
+            </Button>
             <Button 
               variant="ghost" 
               size="icon"
-              leftIcon={<Settings size={18} />}
-            />
+              onClick={() => setSettingsDialogOpen(true)}
+            >
+              <Settings size={18} />
+            </Button>
             <Button 
               variant="secondary"
-              leftIcon={<Eye size={18} />}
               onClick={() => navigate(`/preview/${state.currentForm?.id}`)}
             >
+              <Eye size={18} className="mr-2" />
               Preview
             </Button>
           </div>
@@ -186,6 +195,10 @@ const FormBuilder: React.FC = () => {
           <AddQuestionButton onSelectType={handleAddQuestion} />
         </div>
       </div>
+      
+      {/* Theme and Settings dialogs */}
+      <ThemeSelector open={themeDialogOpen} onOpenChange={setThemeDialogOpen} />
+      <SettingsDialog open={settingsDialogOpen} onOpenChange={setSettingsDialogOpen} />
     </PageTransition>
   );
 };
