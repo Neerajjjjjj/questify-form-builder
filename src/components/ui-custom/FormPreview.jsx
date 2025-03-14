@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import PageTransition from './PageTransition';
 import Button from './Button';
 import { useForm } from '@/context/FormContext';
-import { ArrowLeft, Send, Calendar, Clock, Upload, FileText } from 'lucide-react';
+import { ArrowLeft, Send, Calendar, Clock, Upload, Image } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 
@@ -15,8 +15,8 @@ const FormPreview = () => {
   
   const [form, setForm] = useState(undefined);
   const [answers, setAnswers] = useState({});
-  const [submitted, setSubmitted] = useState(false);
   const [fileData, setFileData] = useState({});
+  const [submitted, setSubmitted] = useState(false);
   
   useEffect(() => {
     if (formId) {
@@ -31,6 +31,7 @@ const FormPreview = () => {
         });
         
         setAnswers(initialAnswers);
+        setFileData({});
       } else {
         // Form not found
         navigate('/');
@@ -56,15 +57,22 @@ const FormPreview = () => {
     });
   };
   
-  const handleFileUpload = (questionId, file) => {
-    // Store the file in the fileData state for preview
-    setFileData(prev => ({
+  const handleFileChange = (questionId, file) => {
+    // Store the filename in answers
+    setAnswers(prev => ({
       ...prev,
-      [questionId]: file
+      [questionId]: file.name
     }));
     
-    // Also store the filename in answers
-    handleInputChange(questionId, file.name);
+    // Create a file preview URL
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setFileData(prev => ({
+        ...prev,
+        [questionId]: reader.result
+      }));
+    };
+    reader.readAsDataURL(file);
   };
   
   const handleSubmit = (e) => {
@@ -83,23 +91,20 @@ const FormPreview = () => {
       return;
     }
     
-    // Format answers for submission, including file data as base64
+    // Format answers for submission, including file data
     const formattedAnswers = Object.entries(answers).map(([questionId, value]) => {
       const question = form.questions.find(q => q.id === questionId);
-      
-      // If this is a file question and we have file data, include a preview URL
-      if (question?.type === 'file' && fileData[questionId]) {
-        return {
-          questionId,
-          value,
-          filePreviewUrl: URL.createObjectURL(fileData[questionId])
-        };
-      }
-      
-      return {
+      const answer = {
         questionId,
         value
       };
+      
+      // If this is a file answer and we have file data, include it
+      if (question?.type === 'file' && fileData[questionId]) {
+        answer.fileData = fileData[questionId];
+      }
+      
+      return answer;
     });
     
     if (form) {
@@ -206,9 +211,10 @@ const FormPreview = () => {
               key={question.id}
               question={question}
               value={answers[question.id]}
+              filePreview={fileData[question.id]}
               onChange={(value) => handleInputChange(question.id, value)}
-              onFileUpload={(file) => handleFileUpload(question.id, file)}
               onCheckboxChange={(value, checked) => handleCheckboxChange(question.id, value, checked)}
+              onFileChange={(file) => handleFileChange(question.id, file)}
               className={index === form.questions.length - 1 ? 'rounded-b-lg mb-6' : 'mb-px'}
             />
           ))}
@@ -235,19 +241,24 @@ const FormPreview = () => {
 const QuestionInput = ({
   question,
   value,
+  filePreview,
   onChange,
   onCheckboxChange,
-  onFileUpload,
+  onFileChange,
   className
 }) => {
   const [file, setFile] = useState(null);
 
-  const handleFileChange = (e) => {
+  const handleFileInputChange = (e) => {
     const files = e.target.files;
     if (files && files.length > 0) {
       setFile(files[0]);
-      onFileUpload(files[0]);
+      onFileChange(files[0]);
     }
+  };
+
+  const isImageFile = (file) => {
+    return file && file.type.startsWith('image/');
   };
 
   return (
@@ -291,25 +302,31 @@ const QuestionInput = ({
       
       {question.type === 'date' && (
         <div className="flex items-center">
-          <input
-            type="date"
-            value={value || ''}
-            onChange={(e) => onChange(e.target.value)}
-            className="w-full px-3 py-2 border border-form-card-border rounded-md focus:border-form-accent-blue"
-            required={question.required}
-          />
+          <div className="relative w-full">
+            <input
+              type="date"
+              value={value || ''}
+              onChange={(e) => onChange(e.target.value)}
+              className="w-full pl-3 pr-10 py-2 border border-form-card-border rounded-md focus:border-form-accent-blue"
+              required={question.required}
+            />
+            <Calendar className="absolute right-3 top-1/2 transform -translate-y-1/2 text-form-dark-gray pointer-events-none" size={16} />
+          </div>
         </div>
       )}
       
       {question.type === 'time' && (
         <div className="flex items-center">
-          <input
-            type="time"
-            value={value || ''}
-            onChange={(e) => onChange(e.target.value)}
-            className="w-full px-3 py-2 border border-form-card-border rounded-md focus:border-form-accent-blue"
-            required={question.required}
-          />
+          <div className="relative w-full">
+            <input
+              type="time"
+              value={value || ''}
+              onChange={(e) => onChange(e.target.value)}
+              className="w-full pl-3 pr-10 py-2 border border-form-card-border rounded-md focus:border-form-accent-blue"
+              required={question.required}
+            />
+            <Clock className="absolute right-3 top-1/2 transform -translate-y-1/2 text-form-dark-gray pointer-events-none" size={16} />
+          </div>
         </div>
       )}
       
@@ -323,22 +340,22 @@ const QuestionInput = ({
             <input 
               type="file" 
               className="hidden" 
-              onChange={handleFileChange} 
+              onChange={handleFileInputChange} 
               required={question.required}
             />
           </label>
           
           {file && (
-            <div className="mt-2">
-              <div className="text-sm text-form-dark-gray mb-1">
-                File selected: <span className="font-medium">{file.name}</span> ({Math.round(file.size / 1024)} KB)
+            <div className="mt-3">
+              <div className="text-sm text-form-dark-gray mb-2">
+                File selected: <span className="font-medium">{file.name}</span>
               </div>
               
-              {file.type.startsWith('image/') && (
+              {isImageFile(file) && filePreview && (
                 <div className="mt-2 border rounded-md overflow-hidden" style={{maxWidth: '300px'}}>
                   <img 
-                    src={URL.createObjectURL(file)} 
-                    alt="Preview" 
+                    src={filePreview} 
+                    alt="File preview" 
                     className="w-full h-auto"
                   />
                 </div>

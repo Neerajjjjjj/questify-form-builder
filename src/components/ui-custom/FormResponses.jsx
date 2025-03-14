@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import PageTransition from './PageTransition';
@@ -6,6 +5,7 @@ import Button from './Button';
 import { useForm } from '@/context/FormContext';
 import { ArrowLeft, Download, ChevronDown, ChevronUp, ExternalLink, FileText, Image } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Skeleton } from '../ui/skeleton';
 
 const FormResponses = () => {
   const { formId } = useParams();
@@ -15,15 +15,27 @@ const FormResponses = () => {
   const [form, setForm] = useState(undefined);
   const [responses, setResponses] = useState([]);
   const [expandedResponseId, setExpandedResponseId] = useState(null);
+  const [imagePreviewUrls, setImagePreviewUrls] = useState({});
   
   useEffect(() => {
     if (formId) {
       const currentForm = getForm(formId);
       if (currentForm) {
         setForm(currentForm);
-        setResponses(getResponses(formId));
+        const formResponses = getResponses(formId);
+        setResponses(formResponses);
+        
+        const previewUrls = {};
+        formResponses.forEach(response => {
+          response.answers.forEach(answer => {
+            const question = currentForm.questions.find(q => q.id === answer.questionId);
+            if (question?.type === 'file' && answer.fileData) {
+              previewUrls[`${response.id}-${answer.questionId}`] = answer.fileData;
+            }
+          });
+        });
+        setImagePreviewUrls(previewUrls);
       } else {
-        // Form not found, redirect to dashboard
         navigate('/');
       }
     }
@@ -45,14 +57,11 @@ const FormResponses = () => {
   const exportResponsesToCSV = () => {
     if (!form || responses.length === 0) return;
     
-    // Create CSV header row with question titles
     const headers = ['Timestamp', ...form.questions.map(q => q.title)];
     
-    // Create data rows
     const rows = responses.map(response => {
       const row = [formatDate(response.submittedAt)];
       
-      // Add answer for each question
       form.questions.forEach(question => {
         const answer = response.answers.find(a => a.questionId === question.id);
         if (answer) {
@@ -62,20 +71,18 @@ const FormResponses = () => {
             row.push(answer.value);
           }
         } else {
-          row.push(''); // No answer for this question
+          row.push('');
         }
       });
       
       return row;
     });
     
-    // Combine header and rows
     const csvContent = [
       headers.join(','),
       ...rows.map(row => row.join(','))
     ].join('\n');
     
-    // Create download link
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -85,6 +92,10 @@ const FormResponses = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+  
+  const isImageFile = (filename) => {
+    return /\.(jpeg|jpg|gif|png|webp|bmp)$/i.test(filename);
   };
   
   if (!form) {
@@ -97,7 +108,6 @@ const FormResponses = () => {
   
   return (
     <PageTransition className="min-h-screen bg-form-light-gray pb-16">
-      {/* Top navigation bar */}
       <header className="bg-white border-b border-form-card-border sticky top-0 z-10">
         <div className="max-w-screen-xl mx-auto px-4 flex items-center justify-between h-16">
           <div className="flex items-center gap-4">
@@ -133,7 +143,6 @@ const FormResponses = () => {
         </div>
       </header>
       
-      {/* Responses content */}
       <div className="max-w-screen-lg mx-auto pt-8 px-4">
         {responses.length === 0 ? (
           <div className="bg-white rounded-lg border border-form-card-border shadow-subtle p-8 text-center">
@@ -197,13 +206,24 @@ const FormResponses = () => {
                                     <span>{answer.value}</span>
                                   </div>
                                   
-                                  {answer.filePreviewUrl && answer.value.match(/\.(jpeg|jpg|gif|png)$/i) && (
-                                    <div className="mt-2 border rounded-md overflow-hidden" style={{maxWidth: '300px'}}>
-                                      <img 
-                                        src={answer.filePreviewUrl} 
-                                        alt="File preview" 
-                                        className="w-full h-auto"
-                                      />
+                                  {isImageFile(answer.value) ? (
+                                    <div className="mt-2 border rounded-md overflow-hidden max-w-xs">
+                                      {imagePreviewUrls[`${response.id}-${answer.questionId}`] ? (
+                                        <img 
+                                          src={imagePreviewUrls[`${response.id}-${answer.questionId}`]} 
+                                          alt="File preview" 
+                                          className="w-full h-auto"
+                                        />
+                                      ) : (
+                                        <div className="p-4 text-center text-form-dark-gray">
+                                          <Image size={24} className="mx-auto mb-2" />
+                                          <p className="text-sm">Preview not available</p>
+                                        </div>
+                                      )}
+                                    </div>
+                                  ) : (
+                                    <div className="mt-2 p-2 border rounded-md text-form-dark-gray text-sm">
+                                      Non-image file
                                     </div>
                                   )}
                                 </div>
