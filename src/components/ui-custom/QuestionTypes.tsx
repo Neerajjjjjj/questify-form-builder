@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { 
   AlignLeft, 
@@ -10,7 +9,10 @@ import {
   List,
   CheckSquare,
   ChevronDown,
-  Plus
+  Plus,
+  Calendar,
+  Clock,
+  Upload
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
@@ -36,9 +38,7 @@ export const QuestionCard: React.FC<QuestionProps> = ({
   const [options, setOptions] = useState<Option[]>(question.options || []);
   const titleRef = useRef<HTMLTextAreaElement>(null);
 
-  // Update question when local state changes
   useEffect(() => {
-    // Only update if something has changed
     if (
       title !== question.title || 
       description !== question.description || 
@@ -55,7 +55,6 @@ export const QuestionCard: React.FC<QuestionProps> = ({
     }
   }, [title, description, required, options]);
 
-  // Auto-adjust height of textarea
   useEffect(() => {
     if (titleRef.current) {
       titleRef.current.style.height = 'auto';
@@ -63,7 +62,6 @@ export const QuestionCard: React.FC<QuestionProps> = ({
     }
   }, [title]);
 
-  // Handle option changes
   const addOption = () => {
     const newOption: Option = { id: `opt-${Date.now()}`, value: '' };
     setOptions([...options, newOption]);
@@ -77,7 +75,6 @@ export const QuestionCard: React.FC<QuestionProps> = ({
     setOptions(options.filter(opt => opt.id !== id));
   };
 
-  // Type icon mapping
   const TypeIcon = () => {
     switch (question.type) {
       case 'short':
@@ -90,6 +87,12 @@ export const QuestionCard: React.FC<QuestionProps> = ({
         return <CheckSquare size={18} />;
       case 'dropdown':
         return <ChevronDown size={18} />;
+      case 'date':
+        return <Calendar size={18} />;
+      case 'time':
+        return <Clock size={18} />;
+      case 'file':
+        return <Upload size={18} />;
       default:
         return <Type size={18} />;
     }
@@ -138,7 +141,6 @@ export const QuestionCard: React.FC<QuestionProps> = ({
         </div>
       </div>
       
-      {/* Question content based on type */}
       <div className="ml-8 mt-6">
         {(question.type === 'short') && (
           <div className="border-b border-form-card-border py-2 text-form-dark-gray">
@@ -149,6 +151,24 @@ export const QuestionCard: React.FC<QuestionProps> = ({
         {(question.type === 'paragraph') && (
           <div className="border-b border-form-card-border py-2 pb-12 text-form-dark-gray">
             Long answer text
+          </div>
+        )}
+        
+        {(question.type === 'date') && (
+          <div className="border-b border-form-card-border py-2 text-form-dark-gray flex items-center gap-2">
+            <Calendar size={16} /> Date input
+          </div>
+        )}
+        
+        {(question.type === 'time') && (
+          <div className="border-b border-form-card-border py-2 text-form-dark-gray flex items-center gap-2">
+            <Clock size={16} /> Time input
+          </div>
+        )}
+        
+        {(question.type === 'file') && (
+          <div className="border-b border-form-card-border py-2 text-form-dark-gray flex items-center gap-2">
+            <Upload size={16} /> File upload
           </div>
         )}
         
@@ -198,7 +218,6 @@ export const QuestionCard: React.FC<QuestionProps> = ({
         )}
       </div>
       
-      {/* Footer with actions */}
       <div className="flex items-center justify-between mt-6 pt-4 border-t border-form-card-border">
         <div className="flex items-center gap-4">
           <button 
@@ -261,6 +280,9 @@ export const AddQuestionButton: React.FC<{ onSelectType: (type: Question['type']
     { type: 'multiple_choice', label: 'Multiple choice', icon: <List size={18} /> },
     { type: 'checkbox', label: 'Checkboxes', icon: <CheckSquare size={18} /> },
     { type: 'dropdown', label: 'Dropdown', icon: <ChevronDown size={18} /> },
+    { type: 'date', label: 'Date', icon: <Calendar size={18} /> },
+    { type: 'time', label: 'Time', icon: <Clock size={18} /> },
+    { type: 'file', label: 'File upload', icon: <Upload size={18} /> },
   ] as const;
   
   return (

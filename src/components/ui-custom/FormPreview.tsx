@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import PageTransition from './PageTransition';
 import Button from './Button';
 import { useForm, Question, Form } from '@/context/FormContext';
-import { ArrowLeft, Send } from 'lucide-react';
+import { ArrowLeft, Send, Calendar, Clock, Upload } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 
@@ -220,6 +220,16 @@ const QuestionInput: React.FC<QuestionInputProps> = ({
   onCheckboxChange,
   className
 }) => {
+  const [file, setFile] = useState<File | null>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      setFile(files[0]);
+      onChange(files[0].name); // Store the filename as the value
+    }
+  };
+
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
@@ -257,6 +267,58 @@ const QuestionInput: React.FC<QuestionInputProps> = ({
           rows={4}
           required={question.required}
         />
+      )}
+      
+      {question.type === 'date' && (
+        <div className="flex items-center">
+          <div className="relative">
+            <input
+              type="date"
+              value={value as string || ''}
+              onChange={(e) => onChange(e.target.value)}
+              className="w-full px-3 py-2 border border-form-card-border rounded-md focus:border-form-accent-blue"
+              required={question.required}
+            />
+            <Calendar className="absolute right-3 top-1/2 transform -translate-y-1/2 text-form-dark-gray" size={16} />
+          </div>
+        </div>
+      )}
+      
+      {question.type === 'time' && (
+        <div className="flex items-center">
+          <div className="relative">
+            <input
+              type="time"
+              value={value as string || ''}
+              onChange={(e) => onChange(e.target.value)}
+              className="w-full px-3 py-2 border border-form-card-border rounded-md focus:border-form-accent-blue"
+              required={question.required}
+            />
+            <Clock className="absolute right-3 top-1/2 transform -translate-y-1/2 text-form-dark-gray" size={16} />
+          </div>
+        </div>
+      )}
+      
+      {question.type === 'file' && (
+        <div className="w-full">
+          <label className="flex flex-col items-center px-4 py-6 bg-white text-form-dark-gray rounded-lg border border-dashed border-form-card-border hover:border-form-accent-blue cursor-pointer">
+            <Upload className="mb-2" size={24} />
+            <span className="text-sm">
+              {file ? file.name : 'Click to upload or drag and drop'}
+            </span>
+            <input 
+              type="file" 
+              className="hidden" 
+              onChange={handleFileChange} 
+              required={question.required}
+            />
+          </label>
+          {file && (
+            <div className="mt-2 text-sm text-form-dark-gray">
+              File selected: <span className="font-medium">{file.name}</span>
+            </div>
+          )}
+        </div>
       )}
       
       {question.type === 'multiple_choice' && question.options && (

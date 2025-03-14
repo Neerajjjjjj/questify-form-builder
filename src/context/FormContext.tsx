@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useReducer, ReactNode, useEffect } from 'react';
 
 // Types for our form data
@@ -9,7 +8,7 @@ export interface Option {
 
 export interface Question {
   id: string;
-  type: 'short' | 'paragraph' | 'multiple_choice' | 'checkbox' | 'dropdown';
+  type: 'short' | 'paragraph' | 'multiple_choice' | 'checkbox' | 'dropdown' | 'date' | 'time' | 'file';
   title: string;
   required: boolean;
   options?: Option[];
