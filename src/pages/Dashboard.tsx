@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -65,6 +66,13 @@ const Dashboard: React.FC = () => {
           {filteredForms.length === 0 && search && (
             <div className="col-span-full text-center p-6">
               <p className="text-form-dark-gray">No forms found matching "{search}"</p>
+            </div>
+          )}
+          
+          {/* Show message when no forms exist */}
+          {state.forms.length === 0 && (
+            <div className="col-span-full text-center p-6">
+              <p className="text-form-dark-gray">No forms yet. Click "Create New Form" to get started.</p>
             </div>
           )}
         </div>

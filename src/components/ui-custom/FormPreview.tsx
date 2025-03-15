@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import PageTransition from './PageTransition';
 import Button from './Button';
 import { useForm, Question, Form } from '@/context/FormContext';
-import { ArrowLeft, Send, Calendar, Clock, Upload } from 'lucide-react';
+import { ArrowLeft, Send, Calendar, Clock3, Upload } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 
@@ -270,31 +270,31 @@ const QuestionInput: React.FC<QuestionInputProps> = ({
       )}
       
       {question.type === 'date' && (
-        <div className="flex items-center">
-          <div className="relative">
+        <div className="flex items-center w-full">
+          <div className="relative w-full">
             <input
               type="date"
               value={value as string || ''}
               onChange={(e) => onChange(e.target.value)}
-              className="w-full px-3 py-2 border border-form-card-border rounded-md focus:border-form-accent-blue"
+              className="w-full px-3 py-2 border border-form-card-border rounded-md focus:border-form-accent-blue pr-10"
               required={question.required}
             />
-            <Calendar className="absolute right-3 top-1/2 transform -translate-y-1/2 text-form-dark-gray" size={16} />
+            <Calendar className="absolute right-3 top-1/2 transform -translate-y-1/2 text-form-dark-gray pointer-events-none" size={16} />
           </div>
         </div>
       )}
       
       {question.type === 'time' && (
-        <div className="flex items-center">
-          <div className="relative">
+        <div className="flex items-center w-full">
+          <div className="relative w-full">
             <input
               type="time"
               value={value as string || ''}
               onChange={(e) => onChange(e.target.value)}
-              className="w-full px-3 py-2 border border-form-card-border rounded-md focus:border-form-accent-blue"
+              className="w-full px-3 py-2 border border-form-card-border rounded-md focus:border-form-accent-blue pr-10"
               required={question.required}
             />
-            <Clock className="absolute right-3 top-1/2 transform -translate-y-1/2 text-form-dark-gray" size={16} />
+            <Clock3 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-form-dark-gray pointer-events-none" size={16} />
           </div>
         </div>
       )}

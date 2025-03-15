@@ -1,11 +1,17 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
-import { MoreHorizontal } from 'lucide-react';
+import { MoreHorizontal, Trash2, Calendar, Clock3 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
-import { Form } from '@/context/FormContext';
+import { useForm } from '@/context/FormContext';
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu';
+import { toast } from 'sonner';
 
 export interface FormCardProps {
   id?: string;
@@ -38,6 +44,16 @@ const FormCard: React.FC<FormCardProps> = ({
   const formLastEdited = form?.updatedAt ? new Date(form.updatedAt).toLocaleDateString() : lastEdited;
   const formResponseCount = form?.responseCount !== undefined ? form.responseCount : responseCount;
   
+  const { deleteForm } = useForm();
+  
+  const handleDelete = (e) => {
+    e.stopPropagation();
+    if (formId) {
+      deleteForm(formId);
+      toast.success("Form deleted successfully");
+    }
+  };
+  
   return (
     <motion.div
       whileHover={{ y: -5 }}
@@ -69,58 +85,51 @@ const FormCard: React.FC<FormCardProps> = ({
               </p>
             </div>
             <div className="flex space-x-2">
-              {onEdit && (
-                <button 
-                  onClick={(e) => {
-                    e.preventDefault();
-                    onEdit();
-                  }}
-                  className="text-form-dark-gray hover:bg-form-light-gray p-1 rounded-full"
-                >
-                  <MoreHorizontal size={18} />
-                </button>
-              )}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button 
+                    className="text-form-dark-gray hover:bg-form-light-gray p-1 rounded-full"
+                    onClick={(e) => e.preventDefault()}
+                  >
+                    <MoreHorizontal size={18} />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  {onEdit && (
+                    <DropdownMenuItem onClick={(e) => {
+                      e.preventDefault();
+                      onEdit();
+                    }}>
+                      Edit
+                    </DropdownMenuItem>
+                  )}
+                  {onPreview && (
+                    <DropdownMenuItem onClick={(e) => {
+                      e.preventDefault();
+                      onPreview();
+                    }}>
+                      Preview
+                    </DropdownMenuItem>
+                  )}
+                  {onResponses && (
+                    <DropdownMenuItem onClick={(e) => {
+                      e.preventDefault();
+                      onResponses();
+                    }}>
+                      Responses
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuItem 
+                    className="text-form-accent-red"
+                    onClick={handleDelete}
+                  >
+                    <Trash2 size={16} className="mr-2" />
+                    Delete
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
-          
-          {/* Action buttons if callbacks are provided */}
-          {(onEdit || onResponses || onPreview) && (
-            <div className="flex mt-3 space-x-2 justify-end">
-              {onPreview && (
-                <button 
-                  onClick={(e) => {
-                    e.preventDefault();
-                    onPreview();
-                  }}
-                  className="text-xs px-2 py-1 text-form-dark-gray hover:bg-form-light-gray rounded"
-                >
-                  Preview
-                </button>
-              )}
-              {onResponses && (
-                <button 
-                  onClick={(e) => {
-                    e.preventDefault();
-                    onResponses();
-                  }}
-                  className="text-xs px-2 py-1 text-form-dark-gray hover:bg-form-light-gray rounded"
-                >
-                  Responses
-                </button>
-              )}
-              {onEdit && (
-                <button 
-                  onClick={(e) => {
-                    e.preventDefault();
-                    onEdit();
-                  }}
-                  className="text-xs px-2 py-1 text-form-dark-gray hover:bg-form-light-gray rounded"
-                >
-                  Edit
-                </button>
-              )}
-            </div>
-          )}
         </div>
       </Card>
     </motion.div>
