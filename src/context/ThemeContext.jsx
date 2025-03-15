@@ -1,14 +1,6 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-// Define theme types as JSDoc comments instead of TypeScript types
-/**
- * @typedef {'default' | 'purple' | 'green' | 'orange' | 'blue'} ThemeType
- */
-
-/**
- * @type {React.Context<{theme: string, setTheme: Function}>}
- */
 const ThemeContext = createContext({
   theme: 'default',
   setTheme: () => {},
@@ -16,9 +8,6 @@ const ThemeContext = createContext({
 
 export const useTheme = () => useContext(ThemeContext);
 
-/**
- * @param {{children: React.ReactNode}} props
- */
 export const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState('default');
   

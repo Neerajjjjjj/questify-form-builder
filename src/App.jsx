@@ -7,7 +7,6 @@ import { AnimatePresence } from 'framer-motion';
 import { Toaster } from 'sonner';
 
 // Import pages
-import Index from '@/pages/Index';
 import Dashboard from '@/pages/Dashboard';
 import Builder from '@/pages/Builder';
 import Preview from '@/pages/Preview';
