@@ -6,13 +6,12 @@ import { ThemeProvider } from '@/context/ThemeContext';
 import { AnimatePresence } from 'framer-motion';
 import { Toaster } from 'sonner';
 
-// Import pages
-import Index from '@/pages/Index';
-import Dashboard from '@/pages/Dashboard';
-import Builder from '@/pages/Builder';
-import Preview from '@/pages/Preview';
-import Responses from '@/pages/Responses';
-import NotFound from '@/pages/NotFound';
+// Import pages with explicit file extensions
+import Dashboard from '@/pages/Dashboard.tsx';
+import Builder from '@/pages/Builder.tsx';
+import Preview from '@/pages/Preview.tsx';
+import Responses from '@/pages/Responses.tsx';
+import NotFound from '@/pages/NotFound.tsx';
 
 import './App.css';
 
