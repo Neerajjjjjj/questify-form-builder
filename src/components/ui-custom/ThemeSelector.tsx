@@ -4,6 +4,7 @@ import { useTheme } from '@/context/ThemeContext';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Paintbrush, Check } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 interface ThemeSelectorProps {
   open: boolean;
@@ -22,28 +23,34 @@ const ThemeSelector: React.FC<ThemeSelectorProps> = ({ open, onOpenChange }) => 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md rounded-xl border-none bg-white/95 backdrop-blur-sm shadow-elevation-3">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Paintbrush size={18} /> Choose Theme
+          <DialogTitle className="flex items-center gap-2 text-xl">
+            <Paintbrush size={18} className="text-primary" /> Choose Theme
           </DialogTitle>
         </DialogHeader>
         
-        <div className="grid grid-cols-2 gap-4 py-4">
+        <div className="grid grid-cols-2 gap-4 py-6">
           {themes.map((item) => (
-            <div 
+            <motion.div 
               key={item.id}
               className="flex flex-col items-center gap-2"
               onClick={() => setTheme(item.id as any)}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.98 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 17 }}
             >
               <div 
-                className={`w-24 h-24 rounded-lg flex items-center justify-center cursor-pointer border-2 transition-all ${theme === item.id ? 'border-primary shadow-lg' : 'border-transparent hover:border-gray-200'}`}
-                style={{ backgroundColor: item.color }}
+                className={`w-24 h-24 rounded-xl flex items-center justify-center cursor-pointer border-2 transition-all ${theme === item.id ? 'border-primary shadow-lg' : 'border-transparent hover:border-gray-200'}`}
+                style={{ 
+                  background: `linear-gradient(135deg, ${item.color}, ${item.color}CC)`,
+                  boxShadow: theme === item.id ? `0 4px 12px ${item.color}40` : 'none'
+                }}
               >
                 {theme === item.id && <Check className="text-white" size={24} />}
               </div>
-              <span className="text-sm">{item.label}</span>
-            </div>
+              <span className="text-sm font-medium">{item.label}</span>
+            </motion.div>
           ))}
         </div>
       </DialogContent>
