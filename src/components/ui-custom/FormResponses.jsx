@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import PageTransition from './PageTransition';
@@ -15,26 +16,13 @@ const FormResponses = () => {
   const [form, setForm] = useState(undefined);
   const [responses, setResponses] = useState([]);
   const [expandedResponseId, setExpandedResponseId] = useState(null);
-  const [imagePreviewUrls, setImagePreviewUrls] = useState({});
   
   useEffect(() => {
     if (formId) {
       const currentForm = getForm(formId);
       if (currentForm) {
         setForm(currentForm);
-        const formResponses = getResponses(formId);
-        setResponses(formResponses);
-        
-        const previewUrls = {};
-        formResponses.forEach(response => {
-          response.answers.forEach(answer => {
-            const question = currentForm.questions.find(q => q.id === answer.questionId);
-            if (question?.type === 'file' && answer.fileData) {
-              previewUrls[`${response.id}-${answer.questionId}`] = answer.fileData;
-            }
-          });
-        });
-        setImagePreviewUrls(previewUrls);
+        setResponses(getResponses(formId));
       } else {
         navigate('/');
       }
@@ -208,9 +196,9 @@ const FormResponses = () => {
                                   
                                   {isImageFile(answer.value) ? (
                                     <div className="mt-2 border rounded-md overflow-hidden max-w-xs">
-                                      {imagePreviewUrls[`${response.id}-${answer.questionId}`] ? (
+                                      {answer.fileData ? (
                                         <img 
-                                          src={imagePreviewUrls[`${response.id}-${answer.questionId}`]} 
+                                          src={answer.fileData} 
                                           alt="File preview" 
                                           className="w-full h-auto"
                                         />
